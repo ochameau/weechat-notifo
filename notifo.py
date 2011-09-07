@@ -62,9 +62,13 @@ def show_notification(chan, message):
             "title": chan
             }
         opt = urllib.urlencode(opt_dict)
-        req = urllib2.Request(url, opt)
         basic = "Basic %s" % ":".join([NOTIFO_USER, NOTIFO_API_SECRET]).encode("base64").strip()
-        req.add_header("Authorization", basic)
-        res = urllib2.urlopen(req)
+        python2_bin = weechat.info_get("python2_bin", "") or "python"
+        weechat.hook_process(
+            python2_bin + " -c \"import urllib2\n"
+            "req = urllib2.Request('" + url + "', '" + opt + "')\n"
+            "req.add_header('Authorization', '" + basic + "')\n"
+            "res = urllib2.urlopen(req)\n\"",
+            30 * 1000, "", "")
 
 # vim: autoindent expandtab smarttab shiftwidth=4
